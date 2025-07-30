@@ -17,7 +17,7 @@ public enum UserRole {
     PRODUCTOR(List.of("ROLE_PRODUCTOR", "ROLE_USER")),
     USER(List.of("ROLE_USER"));
 
-    /**
+    /** 
      * Lista de autoridades associadas ao papel.
      */
     private final List<String> roles;
