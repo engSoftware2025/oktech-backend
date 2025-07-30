@@ -28,14 +28,14 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
+        // String path = request.getRequestURI();
 
-        // Ignore filters for documentation endpoints and Swagger static resources
-        // if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") ||
-        // path.startsWith("/webjars")) {
-        // filterChain.doFilter(request, response);
-        // return;
-        // }
+        // // Ignore filters for documentation endpoints and Swagger static resources
+        // // if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") ||
+        // // path.startsWith("/webjars")) {
+        // // filterChain.doFilter(request, response);
+        // // return;
+        // // }
 
         var tokenJWT = recuperarToken(request);
         if (tokenJWT != null) {

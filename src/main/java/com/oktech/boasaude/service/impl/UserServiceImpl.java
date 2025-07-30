@@ -2,6 +2,8 @@ package com.oktech.boasaude.service.impl;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,8 @@ public class UserServiceImpl implements UserService {
      */
     private final PasswordEncoder passwordEncoder;
 
+    private static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+
     public UserServiceImpl(UserRepository userRepository, @Autowired PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -51,9 +55,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(CreateUserDto createUserDto) {
         if (userRepository.existsByEmail(createUserDto.email())) {
+            logger.error("Email already exists: {}", createUserDto.email());
             throw new IllegalArgumentException("Email already exists");
         }
         if (userRepository.existsByCpf(createUserDto.cpf())) {
+            logger.error("CPF already exists: {}", createUserDto.cpf());
             throw new IllegalArgumentException("CPF already exists");
         }
         User user = new User(createUserDto);
@@ -71,7 +77,13 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User getUserById(UUID id) {
-        return userRepository.findById(id).orElse(null);
+        try {
+            logger.info("Fetching user by ID: {}", id);
+            return userRepository.findById(id).orElse(null);
+        } catch (Exception e) {
+            logger.error("Error fetching user by ID: {}", id, e);
+        }
+        return null;
     }
 
     /**
@@ -95,14 +107,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(UUID id, User user) {
         User existingUser = userRepository.findById(id).orElse(null);
+
         if (existingUser != null) {
+            logger.info("Updating user with ID: {}", id);
             existingUser.setName(user.getName());
             existingUser.setEmail(user.getEmail());
             existingUser.setCpf(user.getCpf());
             existingUser.setPassword(user.getPassword());
             return userRepository.save(existingUser);
         }
-        return null; // or throw an exception
+        logger.error("User not found for ID: {}", id);
+        return null;
     }
 
     /**
@@ -115,9 +130,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(UUID id) {
         User existingUser = userRepository.findById(id).orElse(null);
+        logger.info("Deleting user with ID: {}", id);
         if (existingUser != null) {
+            logger.info("User found for ID: {}", id);
             existingUser.setActive(false); // Soft delete
             userRepository.save(existingUser);
+        } else {
+            logger.error("User not found for ID: {}", id);
         }
     }
 
@@ -129,6 +148,14 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        logger.info("Fetching user by email: {}", email);
+        var user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            logger.info("User found: {}", user.get().getEmail());
+            return user.get();
+        } else {
+            logger.warn("User not found for email: {}", email);
+            return null;
+        }
     }
 }
