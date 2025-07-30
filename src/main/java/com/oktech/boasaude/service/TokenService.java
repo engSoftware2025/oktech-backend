@@ -22,9 +22,9 @@ public interface TokenService {
      */
     String validateToken(String token);
     /**
-     * Extrai o ID do usuário do token JWT.
-     * * @param token o token JWT do qual o ID do usuário será extraído
-     * @return o ID do usuário como UUID, ou null se a extração falhar
+     * Extracts the user ID from the JWT token.
+     * @param token the JWT token from which the user ID will be extracted
+     * @return the user ID as UUID, or null if extraction fails
      */
     public UUID getUserIdFromToken(String token);
     

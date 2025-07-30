@@ -11,3 +11,6 @@ logging:
     org.springframework: ERROR
     org.hibernate: ERROR
     com.oktech.boasaude: ERROR
+
+jwt:
+    secret: mysecret
