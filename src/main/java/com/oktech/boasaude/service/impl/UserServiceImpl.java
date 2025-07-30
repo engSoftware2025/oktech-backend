@@ -9,8 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.oktech.boasaude.dto.CreateUserDto;
-import com.oktech.boasaude.dto.LoginUserDto;
-import com.oktech.boasaude.entity.AuthProvider;
+
 import com.oktech.boasaude.entity.User;
 import com.oktech.boasaude.repository.UserRepository;
 import com.oktech.boasaude.service.UserService;
@@ -59,11 +58,9 @@ public class UserServiceImpl implements UserService {
         }
         User user = new User(createUserDto);
         user.setPassword(passwordEncoder.encode(createUserDto.password())); // Encode the password
-        
-        
+
         return userRepository.save(user);
-    
-    
+
     }
 
     /**
@@ -123,7 +120,6 @@ public class UserServiceImpl implements UserService {
             userRepository.save(existingUser);
         }
     }
-
 
     /**
      * Busca um usuário pelo email.

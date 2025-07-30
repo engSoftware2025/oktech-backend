@@ -33,8 +33,8 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         // Ignore filters for documentation endpoints and Swagger static resources
         // if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") ||
         // path.startsWith("/webjars")) {
-        //     filterChain.doFilter(request, response);
-        //     return;
+        // filterChain.doFilter(request, response);
+        // return;
         // }
 
         var tokenJWT = recuperarToken(request);
