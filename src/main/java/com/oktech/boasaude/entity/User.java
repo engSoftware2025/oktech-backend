@@ -11,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.oktech.boasaude.dto.CreateUserDto;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -75,7 +77,16 @@ public class User implements UserDetails {
     /**
      * Construtor para criar um usuário com o papel de USUÁRIO.
      */
-
+    public User(CreateUserDto createUserDto) {
+        this.name = createUserDto.name();
+        this.email = createUserDto.email();
+        this.cpf = createUserDto.cpf();
+        this.phone = createUserDto.phone();
+        this.authProvider = AuthProvider.LOCAL; // Default to local authentication
+        this.role = UserRole.USER; // Default role is USER
+        this.isActive = true; // New users are active by default
+        
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.role != null

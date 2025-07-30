@@ -2,55 +2,52 @@ package com.oktech.boasaude.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * @author Arlindo Neto
- *         Configuração de segurança da aplicação.
- *         Define as regras de autenticação e autorização.
- * 
- */
+import com.oktech.boasaude.service.TokenService;
+import com.oktech.boasaude.service.UserService;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    /**
-     * Configura o filtro de segurança HTTP.
-     * Permite acesso a endpoints de autenticação e exige autenticação para outros
-     * endpoints.
-     *
-     * @param http a configuração de segurança HTTP
-     * @return o filtro de segurança configurado
-     * @throws Exception se ocorrer um erro ao configurar a segurança
-     */
+
+    private final UserService userService;
+    private final TokenService tokenService;
+
+    public SecurityConfig(UserService userService, TokenService tokenService) {
+        this.userService = userService;
+        this.tokenService = tokenService;
+    }
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { // Configurações de segurança
-                                                                                         // HTTP
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        UserAuthenticationFilter filter = new UserAuthenticationFilter(tokenService, userService);
+
         http
-                .cors(Customizer.withDefaults()) // se precisar
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v1/auth/**", "/actuator/**").permitAll() // Permite acesso a endpoints de
-                                                                                    // autenticação e do Actuator
-                        .requestMatchers("/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/v1/produtor/**").hasAnyRole("PRODUCTOR", "ADMIN")
-                        .anyRequest().authenticated());// Exige autenticação para qualquer outra requisição
+                        .requestMatchers("/v1/auth/**", "/actuator/**", "/v3/api-docs/**", "/swagger-ui.html",
+                                "/swagger-ui/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
+                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
-    /**
-     * Cria um bean de PasswordEncoder para codificação de senhas.
-     * Utiliza BCryptPasswordEncoder para segurança.
-     *
-     * @return o PasswordEncoder configurado
-     */
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Usando BCrypt para codificação de senhas
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
+
 }

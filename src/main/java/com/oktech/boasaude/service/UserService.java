@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.oktech.boasaude.dto.CreateUserDto;
+import com.oktech.boasaude.dto.LoginUserDto;
 import com.oktech.boasaude.entity.User;
 
 /**
@@ -25,4 +26,6 @@ public interface UserService {
     User updateUser(UUID id, User user);
 
     void deleteUser(UUID id);
+
+    User getUserByEmail(String email);
 }

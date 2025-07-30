@@ -1,3 +1,13 @@
 spring:
-    application:
-        name: boasaude
+  application:
+    name: boasaude
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    org.springframework: ERROR
+    org.hibernate: ERROR
+    com.oktech.boasaude: ERROR
