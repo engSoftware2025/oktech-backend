@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.oktech.boasaude.dto.CreateUserDto;
+import com.oktech.boasaude.dto.LoginUserDto;
+import com.oktech.boasaude.entity.AuthProvider;
 import com.oktech.boasaude.entity.User;
 import com.oktech.boasaude.repository.UserRepository;
 import com.oktech.boasaude.service.UserService;
@@ -55,13 +57,13 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByCpf(createUserDto.cpf())) {
             throw new IllegalArgumentException("CPF already exists");
         }
-        User user = new User();
-        user.setName(createUserDto.name());
-        user.setEmail(createUserDto.email());
-        user.setCpf(passwordEncoder.encode(createUserDto.cpf()));
-        user.setPassword(passwordEncoder.encode(createUserDto.password()));
-        user.setPhone(createUserDto.phone());
+        User user = new User(createUserDto);
+        user.setPassword(passwordEncoder.encode(createUserDto.password())); // Encode the password
+        
+        
         return userRepository.save(user);
+    
+    
     }
 
     /**
@@ -122,4 +124,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
+    /**
+     * Busca um usuário pelo email.
+     * 
+     * @param email Email do usuário a ser buscado.
+     * @return O usuário encontrado ou null se não existir.
+     */
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
 }

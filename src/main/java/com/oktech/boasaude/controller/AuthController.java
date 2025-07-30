@@ -5,9 +5,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.oktech.boasaude.dto.CreateUserDto;
 import com.oktech.boasaude.dto.LoginUserDto;
+import com.oktech.boasaude.service.TokenService;
 import com.oktech.boasaude.service.UserService;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -29,13 +35,18 @@ public class AuthController {
 
     private final UserService userService;
 
+    private final AuthenticationManager manager;
+
+    private final TokenService tokenService;
     /**
      * Construtor que recebe o UserService.
      * 
      * @param userService UserService para manipulação de usuários.
      */
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, AuthenticationManager manager, TokenService tokenService) {
         this.userService = userService;
+        this.manager = manager;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -51,15 +62,18 @@ public class AuthController {
         return ResponseEntity.ok("User registered successfully");
     }
 
-    /**
-     * Endpoint para login de usuário.
-     * 
-     * @param loginUserDto DTO com os dados de login do usuário.
-     * @return ResponseEntity com mensagem de sucesso.
-     */
+@PostMapping("login")
+public ResponseEntity<String> loginUser(@RequestBody @Valid LoginUserDto loginUserDto) {
+    try {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(
+            loginUserDto.email(), loginUserDto.password());
 
-    @PostMapping("login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginUserDto loginUserDto) {
-        return ResponseEntity.ok("User logged in successfully");
+        var authentication = manager.authenticate(authenticationToken);
+
+        String token = tokenService.generateToken(authentication.getName());
+        return ResponseEntity.ok(token);
+    } catch (AuthenticationException ex) {
+        return ResponseEntity.status(401).body("Invalid credentials");
     }
+}
 }
