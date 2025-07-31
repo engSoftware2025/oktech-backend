@@ -5,12 +5,14 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.oktech.boasaude.service.TokenService;
 import com.oktech.boasaude.service.UserService;
 
@@ -19,7 +21,7 @@ public class TokenServiceImpl implements TokenService {
 
     private static final Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
 
-    @org.springframework.beans.factory.annotation.Value("${jwt.secret}")
+    @Value("${jwt.secret}")
     private String secret;
 
     private final UserService userService;
@@ -56,19 +58,15 @@ public class TokenServiceImpl implements TokenService {
         }
     }
 
-    @Override
-    public String validateToken(String token) {
+    public DecodedJWT getDecodedToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            
-            JWT.require(algorithm)
+            return JWT.require(algorithm)
                     .withIssuer("oktech")
                     .build()
                     .verify(token);
-            
-            return token;
         } catch (JWTVerificationException e) {
-            logger.error("Error validating JWT token", e);
+            logger.error("Invalid JWT token", e);
             return null;
         }
     }
@@ -76,13 +74,10 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public UUID getUserIdFromToken(String token) {
         try {
-            String validatedToken = this.validateToken(token);
-
-            if (validatedToken == null) {
+            DecodedJWT decodedJWT = getDecodedToken(token);
+            if (decodedJWT == null)
                 return null;
-            }
 
-            var decodedJWT = JWT.decode(validatedToken);
             String userIdStr = decodedJWT.getClaim("userId").asString();
             return UUID.fromString(userIdStr);
         } catch (Exception e) {
