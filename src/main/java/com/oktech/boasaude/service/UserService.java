@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.oktech.boasaude.dto.CreateUserDto;
-import com.oktech.boasaude.dto.LoginUserDto;
 import com.oktech.boasaude.entity.User;
 
 /**

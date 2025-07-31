@@ -1,0 +1,6 @@
+{"properties": [{
+  "name": "jwt.secret",
+  "type": "java.lang.String",
+  "description": "Secret key for JWT signing and validation",
+  "defaultValue": "mysecret"
+}]}
