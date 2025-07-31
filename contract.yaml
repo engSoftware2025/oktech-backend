@@ -1,0 +1,40 @@
+# contract.yaml
+# This file defines the structure of user, address, shop, and product entities in an e-commerce application.
+# It includes the fields that are necessary for managing these entities in the system.
+
+user:
+  id: UUID
+  name: string
+  email: string
+  cpf: string
+  phone: string
+  address: address
+  createdAt: date
+  updatedAt: date
+
+address:
+  street: string
+  city: string
+  state: string
+  complement: string
+  cep: string
+
+shop:
+  id: UUID
+  ownerId: UUID
+  name: string
+  address: address
+  contactEmail: string
+  createdAt: date
+  updatedAt: date
+
+product:
+  id: UUID
+  shopId: UUID
+  name: string
+  description: string
+  price: number
+  category: string
+  stock: number
+  createdAt: date
+  updatedAt: date

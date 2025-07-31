@@ -1,5 +1,6 @@
 package com.oktech.boasaude.dto;
 
+import com.oktech.boasaude.entity.User;
 import com.oktech.boasaude.entity.UserRole;
 
 /**
@@ -10,10 +11,19 @@ import com.oktech.boasaude.entity.UserRole;
  * @version 1.0
  */
 public record UserResponseDto(
-                String id,
-                String name,
-                String email,
-                String cpf,
-                UserRole role) {
+        String id,
+        String name,
+        String email,
+        String cpf,
+        UserRole role) {
+
+    public UserResponseDto(User user) {
+        this(
+                user.getId().toString(),
+                user.getName(),
+                user.getEmail(),
+                user.getCpf(),
+                user.getRole());
+    }
 
 }
