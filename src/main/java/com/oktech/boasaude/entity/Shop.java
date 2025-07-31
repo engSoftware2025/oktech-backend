@@ -34,7 +34,7 @@ public class Shop {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
-    private UUID owner; // ID do Proprietário da loja
+    private User owner; // ID do Proprietário da loja
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Product> products; // Produtos disponíveis na loja
