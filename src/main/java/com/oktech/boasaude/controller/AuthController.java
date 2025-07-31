@@ -10,6 +10,8 @@ import com.oktech.boasaude.service.UserService;
 
 import jakarta.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,6 +40,9 @@ public class AuthController {
     private final AuthenticationManager manager;
 
     private final TokenService tokenService;
+
+    private static Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     /**
      * Construtor que recebe o UserService.
      * 
@@ -57,10 +62,21 @@ public class AuthController {
      */
 
     @PostMapping("register")
-    public ResponseEntity<String> registerUser(@RequestBody CreateUserDto createUserDto) {
+    public ResponseEntity<String> registerUser(@RequestBody @Valid CreateUserDto createUserDto) {
+    try
+    {    
+        logger.info("Registering user: {}", createUserDto);
+        
         userService.createUser(createUserDto);
+
+        logger.info("User registered successfully: {}", createUserDto.email());
         return ResponseEntity.ok("User registered successfully");
     }
+    catch (Exception ex) {
+        logger.error("Error registering user: {}", createUserDto.email(), ex);
+        return ResponseEntity.status(500).body("Error registering user");
+    }
+}
 
 @PostMapping("login")
 public ResponseEntity<String> loginUser(@RequestBody @Valid LoginUserDto loginUserDto) {
@@ -73,6 +89,7 @@ public ResponseEntity<String> loginUser(@RequestBody @Valid LoginUserDto loginUs
         String token = tokenService.generateToken(authentication.getName());
         return ResponseEntity.ok(token);
     } catch (AuthenticationException ex) {
+        logger.error("Authentication failed for user: {}", loginUserDto.email(), ex);
         return ResponseEntity.status(401).body("Invalid credentials");
     }
 }

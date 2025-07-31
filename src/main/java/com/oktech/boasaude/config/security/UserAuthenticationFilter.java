@@ -9,6 +9,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.oktech.boasaude.service.TokenService;
 import com.oktech.boasaude.service.UserService;
 
+import org.springframework.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,17 +26,18 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
+        // String path = request.getRequestURI();
 
-        // Ignore filters for documentation endpoints and Swagger static resources
-        // if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") ||
-        // path.startsWith("/webjars")) {
-        //     filterChain.doFilter(request, response);
-        //     return;
-        // }
+        // // Ignore filters for documentation endpoints and Swagger static resources
+        // // if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") ||
+        // // path.startsWith("/webjars")) {
+        // // filterChain.doFilter(request, response);
+        // // return;
+        // // }
 
         var tokenJWT = recuperarToken(request);
         if (tokenJWT != null) {

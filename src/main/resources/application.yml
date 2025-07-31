@@ -8,9 +8,12 @@ springdoc:
 
 logging:
   level:
-    org.springframework: ERROR
-    org.hibernate: ERROR
-    com.oktech.boasaude: ERROR
+    org:
+      springframework: ERROR
+      hibernate: ERROR
+    com:
+      oktech:
+        boasaude: ERROR
 
 jwt:
-    secret: mysecret
+  secret: mysecret
