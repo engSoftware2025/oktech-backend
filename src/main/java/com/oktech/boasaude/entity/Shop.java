@@ -28,6 +28,7 @@ import com.oktech.boasaude.dto.ShopCreateRequestDto;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
+@EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
 public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -37,8 +38,8 @@ public class Shop {
 
     private String description; // Descrição 
 
-    @Column(nullable = true, unique = true)
-    private String cnpj; // CNPJ da loja, único e não nulo
+    @Column(nullable = false, unique = true)
+    private String cnpj; // Shop CNPJ, unique and not null
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)

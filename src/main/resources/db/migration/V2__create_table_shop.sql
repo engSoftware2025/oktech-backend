@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS shops (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255),
     description TEXT,
-    cnpj VARCHAR(20)  UNIQUE,
+    cnpj VARCHAR(20) NOT NULL UNIQUE,
     owner_id UUID NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
