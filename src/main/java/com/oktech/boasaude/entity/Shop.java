@@ -2,10 +2,15 @@ package com.oktech.boasaude.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import com.oktech.boasaude.dto.ShopCreateRequestDto;
 
 
 /**
@@ -32,14 +37,25 @@ public class Shop {
 
     private String description; // Descrição 
 
-   @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String cnpj; // CNPJ da loja, único e não nulo
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner; // ID do Proprietário da loja
 
-   // @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-   // private List<Product> products; // Produtos disponíveis na loja
+    // Timestamps for creation and last update
+    @CreatedDate
+    private LocalDateTime createdAt;
+    // Timestamp when the user was created
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
+
+    public Shop(ShopCreateRequestDto dto, User owner) {
+        this.name = dto.name();
+        this.description = dto.description();
+        this.cnpj = dto.cnpj();
+        this.owner = owner;
+    }
 }
