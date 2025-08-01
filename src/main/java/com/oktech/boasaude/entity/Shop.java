@@ -2,6 +2,7 @@ package com.oktech.boasaude.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +21,8 @@ import java.util.UUID;
 @Table(name = "shops")
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@Getter
+@Setter
 public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -36,7 +39,7 @@ public class Shop {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner; // ID do Proprietário da loja
 
-    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Product> products; // Produtos disponíveis na loja
+   // @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   // private List<Product> products; // Produtos disponíveis na loja
 
 }
