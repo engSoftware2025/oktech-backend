@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.oktech.boasaude.dto.CreateUserDto;
 import com.oktech.boasaude.dto.LoginUserDto;
+import com.oktech.boasaude.dto.TokenResponse;
 import com.oktech.boasaude.service.TokenService;
 import com.oktech.boasaude.service.UserService;
 
@@ -79,7 +80,8 @@ public class AuthController {
 }
 
 @PostMapping("login")
-public ResponseEntity<String> loginUser(@RequestBody @Valid LoginUserDto loginUserDto) {
+public ResponseEntity<TokenResponse> loginUser(@RequestBody @Valid LoginUserDto loginUserDto) {
+    logger.info("User login attempt: {}", loginUserDto.email());
     try {
         var authenticationToken = new UsernamePasswordAuthenticationToken(
             loginUserDto.email(), loginUserDto.password());
@@ -87,10 +89,10 @@ public ResponseEntity<String> loginUser(@RequestBody @Valid LoginUserDto loginUs
         var authentication = manager.authenticate(authenticationToken);
 
         String token = tokenService.generateToken(authentication.getName());
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new TokenResponse(token));
     } catch (AuthenticationException ex) {
         logger.error("Authentication failed for user: {}", loginUserDto.email(), ex);
-        return ResponseEntity.status(401).body("Invalid credentials");
+        return ResponseEntity.status(401).body(new TokenResponse("Invalid credentials"));
     }
 }
 }

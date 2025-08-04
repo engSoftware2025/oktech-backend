@@ -32,7 +32,7 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public ShopResponseDto createShop(User user, ShopCreateRequestDto dto) {
         // Verifica se o usuário já possui uma loja associada
-        if (shopRepository.findAllByNameContainingIgnoreCase(user.getName()).isEmpty()) {
+        if (!shopRepository.findAllByNameContainingIgnoreCase(user.getName()).isEmpty()) {
             throw new IllegalArgumentException("Usuário já possui uma loja associada.");
         }
         // Valida o CNPJ
