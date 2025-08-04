@@ -18,8 +18,8 @@ import java.util.UUID;
 public interface ShopRepository extends JpaRepository<Shop, UUID> {
     
     Optional<Shop> findByCnpj(String cnpj); // Busca loja por CNPJ
-    
-    List<Shop> findByOwner(UUID ownerId); // Busca lojas por ID do proprietário
+  
+    Optional<Shop> findByOwnerId(UUID ownerId); // Busca loja por ID do proprietário
     
     boolean existsByCnpj(String cnpj); // Verifica se já existe uma loja com o mesmo CNPJ
     
