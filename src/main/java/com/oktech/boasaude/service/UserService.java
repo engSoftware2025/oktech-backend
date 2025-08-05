@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.oktech.boasaude.dto.CreateUserDto;
 import com.oktech.boasaude.entity.User;
+import com.oktech.boasaude.entity.UserRole;
 
 /**
  * Interface para o serviço de usuário.
@@ -27,4 +28,6 @@ public interface UserService {
     void deleteUser(UUID id);
 
     User getUserByEmail(String email);
+
+    boolean updateUserRole(UUID userId, UserRole userRole);
 }
