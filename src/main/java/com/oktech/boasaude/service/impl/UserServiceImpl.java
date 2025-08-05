@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.oktech.boasaude.dto.CreateUserDto;
 
 import com.oktech.boasaude.entity.User;
+import com.oktech.boasaude.entity.UserRole;
 import com.oktech.boasaude.repository.UserRepository;
 import com.oktech.boasaude.service.UserService;
 
@@ -159,5 +160,25 @@ public class UserServiceImpl implements UserService {
             logger.warn("User not found for email: {}", email);
             throw new IllegalArgumentException("User not found: " + email);
         }
+    }
+
+    /**
+     * Atualiza o papel de um usuário.
+     * 
+     * @param userId   ID do usuário a ser atualizado.
+     * @param userRole Novo papel do usuário.
+     * @return true se a atualização foi bem-sucedida, false caso contrário.
+     */
+    @Override
+    public boolean updateUserRole(UUID userId, UserRole userRole) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            logger.error("User not found with ID: {}", userId);
+            throw new IllegalArgumentException("User not found: " + userId);
+        }
+        user.setRole(userRole);
+        userRepository.save(user);
+        logger.info("User role updated successfully for ID: {}", userId);
+        return true;
     }
 }

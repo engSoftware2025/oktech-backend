@@ -4,10 +4,10 @@ import com.oktech.boasaude.dto.ShopCreateRequestDto;
 import com.oktech.boasaude.dto.ShopResponseDto;
 import com.oktech.boasaude.entity.Shop;
 import com.oktech.boasaude.entity.User;
+import com.oktech.boasaude.entity.UserRole;
 import com.oktech.boasaude.repository.ShopRepository;
 import com.oktech.boasaude.service.ShopService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +27,19 @@ import java.util.regex.Pattern;
 @Service
 public class ShopServiceImpl implements ShopService {
 
-    @Autowired
     private ShopRepository shopRepository;
+
+    private UserServiceImpl userService;
 
     private static final String CNPJ_REGEX = "^(\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}|\\d{14})$"; // Formato
                                                                                                    // XX.XXX.XXX/XXXX-XX
                                                                                                    // ou XXXXXXXXXXXXXXX
     private static final Pattern CNPJ_PATTERN = Pattern.compile(CNPJ_REGEX); // Regex para validar CNPJ
+
+    public ShopServiceImpl(ShopRepository shopRepository, UserServiceImpl userService) {
+        this.shopRepository = shopRepository;
+        this.userService = userService;
+    }
 
     @Override
     public ShopResponseDto createShop(User user, ShopCreateRequestDto dto) {
@@ -47,6 +53,10 @@ public class ShopServiceImpl implements ShopService {
         }
         if (!isValidCnpj(dto.cnpj())) {
             throw new IllegalArgumentException("CNPJ inválido.");
+        }
+
+        if (user.getRole() != UserRole.ADMIN) {
+            userService.updateUserRole(user.getId(), UserRole.PRODUCTOR);
         }
 
         Shop shop = new Shop(dto, user); // Cria uma nova loja com os dados do DTO e o usuário
