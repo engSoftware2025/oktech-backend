@@ -34,10 +34,10 @@ public class ValidationServiceImpl implements ValidationService {
     }
 
     @Override
-    @Override
     public boolean isValidEmail(String email) {
         if (email == null || email.isBlank()) {
             return false;
         }
         return EMAIL_PATTERN.matcher(email).matches();
     }
+}
