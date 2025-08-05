@@ -96,6 +96,14 @@ public class ShopServiceImpl implements ShopService {
         if(!shop.getOwner().getId().equals(currentUser.getId())){
             throw new AccessDeniedException("You are not the owner of this shop");
         }
+
+        // Valida o CNPJ
+        if (shopRepository.findByOwnerId(currentUser.getId()).isPresent()) {
+            throw new IllegalArgumentException("CNPJ já cadastrado.");
+        }
+        if (!isValidCnpj(dto.cnpj())) {
+            throw new IllegalArgumentException("CNPJ inválido.");
+        }
         
         shop.setName(dto.name());
         shop.setCnpj(dto.cnpj());
