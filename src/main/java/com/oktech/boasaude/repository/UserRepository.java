@@ -16,16 +16,16 @@ import com.oktech.boasaude.entity.UserRole;
  * @author Arlindo Neto
  * @version 1.0
  */
-public interface UserRepository  extends JpaRepository<User, UUID> {
-    
+public interface UserRepository extends JpaRepository<User, UUID> {
+
     Optional<User> findByEmail(String email);
-    
+
     Optional<User> findByCpf(String cpf);
-    
+
     boolean existsByEmail(String email);
-    
+
     boolean existsByCpf(String cpf);
-    
+
     List<User> findAllByRole(UserRole role);
-    
+
 }

@@ -9,7 +9,7 @@ import com.oktech.boasaude.dto.ShopCreateRequestDto;
 
 public interface ShopService {
 
-    ShopResponseDto createShop(User user, ShopCreateRequestDto  dto); // Cria uma nova loja associada ao usuário
+    ShopResponseDto createShop(User user, ShopCreateRequestDto dto); // Cria uma nova loja associada ao usuário
 
     ShopResponseDto getShopbyuser(User user); // Obtém a loja associada ao usuário
 
