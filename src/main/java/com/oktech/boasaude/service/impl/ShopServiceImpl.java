@@ -6,9 +6,13 @@ import com.oktech.boasaude.entity.Shop;
 import com.oktech.boasaude.entity.User;
 import com.oktech.boasaude.repository.ShopRepository;
 import com.oktech.boasaude.service.ShopService;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 
@@ -68,5 +72,45 @@ public class ShopServiceImpl implements ShopService {
         }
         // Verifica se o CNPJ corresponde ao padrão definido
         return CNPJ_PATTERN.matcher(cnpj).matches();
+    }
+
+
+    @Override
+    public void deleteShop(UUID id, User currentUser){
+        Shop shop = shopRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Shop not found"));
+
+        if(!shop.getOwner().getId().equals(currentUser.getId())){
+            throw new AccessDeniedException("You are not the owner of this shop");
+        }
+
+        shopRepository.delete(shop);
+    }
+
+
+    @Override
+    public ShopResponseDto updateShop(UUID id, ShopCreateRequestDto dto, User currentUser){
+        Shop shop = shopRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Shop not found."));
+
+        if(!shop.getOwner().getId().equals(currentUser.getId())){
+            throw new AccessDeniedException("You are not the owner of this shop");
+        }
+
+        // Valida o CNPJ
+        if (shopRepository.findByOwnerId(currentUser.getId()).isPresent()) {
+            throw new IllegalArgumentException("CNPJ já cadastrado.");
+        }
+        if (!isValidCnpj(dto.cnpj())) {
+            throw new IllegalArgumentException("CNPJ inválido.");
+        }
+        
+        shop.setName(dto.name());
+        shop.setCnpj(dto.cnpj());
+        shop.setDescription(dto.description());
+
+        shopRepository.save(shop);
+
+        return new ShopResponseDto(shop);
     }
 }
