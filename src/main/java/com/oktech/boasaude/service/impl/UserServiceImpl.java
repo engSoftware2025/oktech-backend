@@ -118,7 +118,7 @@ public class UserServiceImpl implements UserService {
             return userRepository.save(existingUser);
         }
         logger.error("User not found for ID: {}", id);
-        throw new IllegalArgumentException("User not found: {}" + id);
+        throw new IllegalArgumentException("User not found: " + id);
     }
 
     /**

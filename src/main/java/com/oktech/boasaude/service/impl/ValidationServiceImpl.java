@@ -25,7 +25,6 @@ public class ValidationServiceImpl implements ValidationService {
                                                                                                    // email
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 
-    // Construtor padrão
     @Override
     public boolean isValidCnpj(String cnpj) {
         if (cnpj == null || cnpj.isBlank()) {
@@ -34,7 +33,7 @@ public class ValidationServiceImpl implements ValidationService {
         return CNPJ_PATTERN.matcher(cnpj).matches();
     }
 
-    // Construtor padrão
+    @Override
     @Override
     public boolean isValidEmail(String email) {
         if (email == null || email.isBlank()) {
@@ -42,5 +41,3 @@ public class ValidationServiceImpl implements ValidationService {
         }
         return EMAIL_PATTERN.matcher(email).matches();
     }
-
-}
