@@ -79,18 +79,19 @@ public class UserServiceImpl implements UserService {
     public User getUserById(UUID id) {
         try {
             logger.info("Fetching user by ID: {}", id);
+
             return userRepository.findById(id).orElse(null);
         } catch (Exception e) {
             logger.error("Error fetching user by ID: {}", id, e);
+            throw new IllegalArgumentException("User not found: " + id, e);
         }
-        return null;
     }
 
     /**
-     * Busca um usuário pelo email.
+     * Busca todos os usuários com paginação.
      * 
-     * @param email Email do usuário a ser buscado.
-     * @return O usuário encontrado ou null se não existir.
+     * @param pageable Objeto Pageable para paginação.
+     * @return Uma página de usuários.
      */
     @Override
     public Page<User> getAllUsers(Pageable pageable) {
@@ -117,7 +118,7 @@ public class UserServiceImpl implements UserService {
             return userRepository.save(existingUser);
         }
         logger.error("User not found for ID: {}", id);
-        return null;
+        throw new IllegalArgumentException("User not found: " + id);
     }
 
     /**
@@ -137,6 +138,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(existingUser);
         } else {
             logger.error("User not found for ID: {}", id);
+            throw new IllegalArgumentException("User not found: " + id);
         }
     }
 
@@ -155,7 +157,7 @@ public class UserServiceImpl implements UserService {
             return user.get();
         } else {
             logger.warn("User not found for email: {}", email);
-            return null;
+            throw new IllegalArgumentException("User not found: " + email);
         }
     }
 }
