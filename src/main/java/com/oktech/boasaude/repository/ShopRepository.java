@@ -2,7 +2,7 @@ package com.oktech.boasaude.repository;
 
 import com.oktech.boasaude.entity.Shop;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;      
+import java.util.List;
 import java.util.Optional;
 
 import java.util.UUID;
@@ -16,13 +16,14 @@ import java.util.UUID;
  */
 
 public interface ShopRepository extends JpaRepository<Shop, UUID> {
-    
+
     Optional<Shop> findByCnpj(String cnpj); // Busca loja por CNPJ
-  
+
     Optional<Shop> findByOwnerId(UUID ownerId); // Busca loja por ID do proprietário
-    
+
     boolean existsByCnpj(String cnpj); // Verifica se já existe uma loja com o mesmo CNPJ
-    
-    List<Shop> findAllByNameContainingIgnoreCase(String name); // Busca lojas por nome, ignorando maiúsculas e minúsculas
-    
+
+    List<Shop> findAllByNameContainingIgnoreCase(String name); // Busca lojas por nome, ignorando maiúsculas e
+                                                               // minúsculas
+
 }

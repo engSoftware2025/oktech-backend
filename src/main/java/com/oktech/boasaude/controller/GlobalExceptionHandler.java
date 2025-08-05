@@ -25,8 +25,10 @@ public class GlobalExceptionHandler {
         logger.error("Error occurred: {}", ex.getMessage(), ex);
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex,
+            WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 request.getDescription(false),

@@ -12,8 +12,7 @@ public interface TokenService {
      * @return o token JWT gerado
      */
     String generateToken(String name);
-    
-    
+
     /**
      * Decodes the provided JWT token and returns its decoded representation.
      *

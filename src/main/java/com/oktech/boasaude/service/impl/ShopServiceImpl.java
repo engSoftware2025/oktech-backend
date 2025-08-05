@@ -7,7 +7,6 @@ import com.oktech.boasaude.entity.User;
 import com.oktech.boasaude.repository.ShopRepository;
 import com.oktech.boasaude.service.ShopService;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -15,11 +14,13 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-
-/** * Implementação do serviço de loja.
+/**
+ * * Implementação do serviço de loja.
  * Fornece métodos para criar e obter lojas associadas a usuários.
- * @author Lucas do Ouro   
- * @version 1.1 - Corrigido o método createShop para verificar se o usuário já possui uma loja associada e validar o CNPJ.
+ * 
+ * @author Lucas do Ouro
+ * @version 1.1 - Corrigido o método createShop para verificar se o usuário já
+ *          possui uma loja associada e validar o CNPJ.
  * @version 1.0 - Implementação inicial do serviço de loja.
  */
 
@@ -29,10 +30,11 @@ public class ShopServiceImpl implements ShopService {
     @Autowired
     private ShopRepository shopRepository;
 
-    private static final String CNPJ_REGEX = "^(\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}|\\d{14})$"; // Formato XX.XXX.XXX/XXXX-XX ou XXXXXXXXXXXXXXX
+    private static final String CNPJ_REGEX = "^(\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}|\\d{14})$"; // Formato
+                                                                                                   // XX.XXX.XXX/XXXX-XX
+                                                                                                   // ou XXXXXXXXXXXXXXX
     private static final Pattern CNPJ_PATTERN = Pattern.compile(CNPJ_REGEX); // Regex para validar CNPJ
 
-    
     @Override
     public ShopResponseDto createShop(User user, ShopCreateRequestDto dto) {
         // Verifica se o usuário já possui uma loja associada
@@ -48,9 +50,9 @@ public class ShopServiceImpl implements ShopService {
         }
 
         Shop shop = new Shop(dto, user); // Cria uma nova loja com os dados do DTO e o usuário
-        
+
         Shop savedShop = shopRepository.save(shop); // Salva a loja no repositório
-    
+
         return new ShopResponseDto(savedShop); // Retorna a resposta com os dados da loja salva
     }
 
@@ -59,9 +61,8 @@ public class ShopServiceImpl implements ShopService {
     public ShopResponseDto getShopbyuser(User user) {
         return shopRepository.findByOwnerId(user.getId()) // Se a loja for encontrada, converte para ShopResponseDto
                 .map(ShopResponseDto::new) // Retorna a loja encontrada como ShopResponseDto
-                .orElseThrow(() -> new IllegalArgumentException("Loja não encontrada para o usuário.")); 
+                .orElseThrow(() -> new IllegalArgumentException("Loja não encontrada para o usuário."));
     }
-
 
     // Valida o CNPJ usando o padrão definido
     @Override
@@ -74,26 +75,24 @@ public class ShopServiceImpl implements ShopService {
         return CNPJ_PATTERN.matcher(cnpj).matches();
     }
 
-
     @Override
-    public void deleteShop(UUID id, User currentUser){
+    public void deleteShop(UUID id, User currentUser) {
         Shop shop = shopRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Shop not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Shop not found"));
 
-        if(!shop.getOwner().getId().equals(currentUser.getId())){
+        if (!shop.getOwner().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not the owner of this shop");
         }
 
         shopRepository.delete(shop);
     }
 
-
     @Override
-    public ShopResponseDto updateShop(UUID id, ShopCreateRequestDto dto, User currentUser){
+    public ShopResponseDto updateShop(UUID id, ShopCreateRequestDto dto, User currentUser) {
         Shop shop = shopRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Shop not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Shop not found."));
 
-        if(!shop.getOwner().getId().equals(currentUser.getId())){
+        if (!shop.getOwner().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You are not the owner of this shop");
         }
 
@@ -104,7 +103,7 @@ public class ShopServiceImpl implements ShopService {
         if (!isValidCnpj(dto.cnpj())) {
             throw new IllegalArgumentException("CNPJ inválido.");
         }
-        
+
         shop.setName(dto.name());
         shop.setCnpj(dto.cnpj());
         shop.setDescription(dto.description());

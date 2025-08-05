@@ -11,7 +11,7 @@ import jakarta.validation.constraints.NotNull;
  * @version 1.0
  */
 public record LoginUserDto(
-        @NotBlank(message = "Email is required") String email,
-        @NotBlank(message = "Password is required") @NotNull(message = "Password is required") String password) {
+                @NotBlank(message = "Email is required") String email,
+                @NotBlank(message = "Password is required") @NotNull(message = "Password is required") String password) {
 
 }

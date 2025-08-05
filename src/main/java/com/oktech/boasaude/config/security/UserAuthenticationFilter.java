@@ -30,48 +30,48 @@ public class UserAuthenticationFilter extends OncePerRequestFilter {
         this.userService = userService;
     }
 
-@Override
-protected void doFilterInternal(@NonNull HttpServletRequest request, 
-                                @NonNull HttpServletResponse response,
-                                @NonNull FilterChain filterChain)
-        throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
 
-    String tokenJWT = recuperarToken(request);
+        String tokenJWT = recuperarToken(request);
 
-    if (tokenJWT != null) {
-        try {
-            UUID userId = tokenService.getUserIdFromToken(tokenJWT);
-            // logger.info("Token JWT recuperado: {}", tokenJWT); // Removed to avoid logging sensitive token information
-            if (userId == null) {
-                logger.warn("Token inválido ou expirado (userId nulo)");
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido ou expirado (userId nulo)");
+        if (tokenJWT != null) {
+            try {
+                UUID userId = tokenService.getUserIdFromToken(tokenJWT);
+                // logger.info("Token JWT recuperado: {}", tokenJWT); // Removed to avoid
+                // logging sensitive token information
+                if (userId == null) {
+                    logger.warn("Token inválido ou expirado (userId nulo)");
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido ou expirado (userId nulo)");
+                    return;
+                }
+
+                var user = userService.getUserById(userId);
+                logger.debug("User retrieved: {}", user != null ? user.getUsername() : "null");
+                if (user == null) {
+                    logger.warn("Usuário não encontrado com ID: {}", userId);
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuário não encontrado");
+                    return;
+                }
+
+                var authentication = new UsernamePasswordAuthenticationToken(
+                        user, null, user.getAuthorities());
+                logger.debug("Authenticated user: {}", user.getUsername());
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            } catch (Exception e) {
+                logger.error("Erro ao autenticar token", e);
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Erro ao autenticar token");
                 return;
             }
-
-            var user = userService.getUserById(userId);
-            logger.debug("User retrieved: {}", user != null ? user.getUsername() : "null");
-            if (user == null) {
-                logger.warn("Usuário não encontrado com ID: {}", userId);
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Usuário não encontrado");
-                return;
-            }
-
-            var authentication = new UsernamePasswordAuthenticationToken(
-                    user, null, user.getAuthorities());
-            logger.debug("Authenticated user: {}", user.getUsername());
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        } catch (Exception e) {
-            logger.error("Erro ao autenticar token", e);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Erro ao autenticar token");
-            return;
         }
+        // logger.debug("Continuing filter to next step");
+        filterChain.doFilter(request, response);
     }
-    // logger.debug("Continuing filter to next step");
-    filterChain.doFilter(request, response);
-}
-
 
     private String recuperarToken(HttpServletRequest request) {
         var authorizationHeader = request.getHeader("Authorization");
