@@ -39,13 +39,13 @@ public class UserServiceImplTest {
                 "1234567890",
                 "password123");
 
-        // Mockando para dizer que email e cpf ainda não existem
+        // Mocking to indicate that email and cpf do not exist yet
         Mockito.when(userRepository.existsByEmail(createUserDto.email())).thenReturn(false);
         Mockito.when(userRepository.existsByCpf(createUserDto.cpf())).thenReturn(false);
 
-        // Mock para o save, simulando que o banco vai retornar o usuário salvo
+        // Mock for save, simulating that the database will return the saved user
         User savedUser = new User(createUserDto);
-        savedUser.setPassword("encodedPassword"); // Simule a senha codificada
+        savedUser.setPassword("encodedPassword"); // Simulate the encoded password
 
         Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(savedUser);
 

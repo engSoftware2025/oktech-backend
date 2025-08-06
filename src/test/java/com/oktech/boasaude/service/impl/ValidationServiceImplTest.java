@@ -1,5 +1,6 @@
 package com.oktech.boasaude.service.impl;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +23,7 @@ public class ValidationServiceImplTest {
 
     @Test
     public void testForNotValidCnpj() {
-        assertTrue(!validationServiceImpl.isValidCnpj("12.345.678/0001-9A"));
+        assertFalse(validationServiceImpl.isValidCnpj("12.345.678/0001-9A"));
     }
 
     @Test
@@ -32,6 +33,6 @@ public class ValidationServiceImplTest {
 
     @Test
     public void testForNotValidEmail() {
-        assertTrue(!validationServiceImpl.isValidEmail("teste@gmail"));
+        assertFalse(validationServiceImpl.isValidEmail("teste@gmail"));
     }
 }
