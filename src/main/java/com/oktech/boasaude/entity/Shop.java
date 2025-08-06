@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.oktech.boasaude.dto.ShopCreateRequestDto;
 
@@ -27,7 +28,7 @@ import com.oktech.boasaude.dto.ShopCreateRequestDto;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Setter
-@EntityListeners(org.springframework.data.jpa.domain.support.AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)
 public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
