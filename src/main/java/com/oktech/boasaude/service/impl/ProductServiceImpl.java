@@ -13,7 +13,6 @@ import com.oktech.boasaude.entity.Product;
 import com.oktech.boasaude.entity.Shop;
 import com.oktech.boasaude.entity.User;
 import com.oktech.boasaude.repository.ProductRepository;
-import com.oktech.boasaude.repository.ShopRepository;
 import com.oktech.boasaude.service.ProductService;
 
 /**
@@ -31,16 +30,16 @@ public class ProductServiceImpl implements ProductService {
      */
     private final ProductRepository productRepository;
     
-    private final ShopRepository shopRepository;
+    private final ShopServiceImpl shopServiceImpl;
     
     /**
      * Injetando o repositório de produtos.
      * @param productRepository Repositório de produtos para operações CRUD.
      * @param shopRepository Repositório de lojas para operações CRUD.
      */
-    public ProductServiceImpl(ProductRepository productRepository, ShopRepository shopRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, ShopServiceImpl shopServiceImpl) {
         this.productRepository = productRepository;
-        this.shopRepository = shopRepository;
+        this.shopServiceImpl = shopServiceImpl;
     }
 
     /**
@@ -60,11 +59,8 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Must be positive stock.");
         }
 
-        Shop shop = shopRepository.findById(shopId).orElse(null);
+        Shop shop = shopServiceImpl.getShopById(shopId);
 
-        if(shop == null) {
-            throw new IllegalArgumentException("Shop not found with id: " + shopId);
-        }
 
         if(!shop.getOwner().getId().equals(currentUser.getId())) {
             throw new AccessDeniedException("You do not have permission to create products for this shop.");
