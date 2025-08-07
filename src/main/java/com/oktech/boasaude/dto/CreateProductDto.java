@@ -18,7 +18,7 @@ public record CreateProductDto(
     @NotBlank(message = "A descrição do produto é obrigatória")
     String description,
 
-    @NotBlank(message = "O preço do produto é obrigatório")
+    @NotBlank(message = "A categoria do produto é obrigatória")
     String category,
 
     @NotNull(message = "A quantidade em estoque do produto é obrigatória")
