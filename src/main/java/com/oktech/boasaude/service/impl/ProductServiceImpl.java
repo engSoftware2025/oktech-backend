@@ -109,11 +109,11 @@ public class ProductServiceImpl implements ProductService {
             throw new AccessDeniedException("You do not have permission to update this product.");
         }
 
-        if(product.getPrice() <= 0){
+        if(CreateProductDto.price() <= 0){
             throw new IllegalArgumentException("Must be positive price.");
         }
 
-        if(product.getStock() <= 0){
+        if(CreateProductDto.stock() <= 0){
             throw new IllegalArgumentException("Must be positive stock.");
         }
 

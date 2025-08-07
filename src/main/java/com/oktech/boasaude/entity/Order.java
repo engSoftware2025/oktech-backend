@@ -1,6 +1,6 @@
 package com.oktech.boasaude.entity;
 
-import java.beans.Transient;
+import jakarta.persistence.Transient;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
