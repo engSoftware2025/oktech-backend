@@ -122,4 +122,10 @@ public class ShopServiceImpl implements ShopService {
 
         return new ShopResponseDto(shop);
     }
+
+    @Override
+    public Shop getShopById(UUID id) {
+        return shopRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Shop not found."));
+    }
 }

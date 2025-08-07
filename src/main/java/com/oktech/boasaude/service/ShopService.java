@@ -1,6 +1,7 @@
 package com.oktech.boasaude.service;
 
 import com.oktech.boasaude.dto.ShopResponseDto;
+import com.oktech.boasaude.entity.Shop;
 import com.oktech.boasaude.entity.User;
 
 import java.util.UUID;
@@ -18,4 +19,6 @@ public interface ShopService {
     ShopResponseDto updateShop(UUID id, ShopCreateRequestDto dto, User currentUser);
 
     void deleteShop(UUID id, User currentUser);
+
+    Shop getShopById(UUID id);
 }
