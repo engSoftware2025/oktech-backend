@@ -71,4 +71,10 @@ public class OrderItem {
         return BigInteger.valueOf(product.getPrice().intValue() * quantity);
     }
 
+    public OrderItem(Order order, Product product, Integer quantity) {
+        this.order = order;
+        this.product = product;
+        this.quantity = quantity;
+    }
+    
 }
