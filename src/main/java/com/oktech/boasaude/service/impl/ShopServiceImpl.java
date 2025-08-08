@@ -8,7 +8,6 @@ import com.oktech.boasaude.entity.UserRole;
 import com.oktech.boasaude.repository.ShopRepository;
 import com.oktech.boasaude.service.ShopService;
 
-import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -78,10 +77,9 @@ public class ShopServiceImpl implements ShopService {
 
     // Obtém a loja pelo ID
     @Override
-    public ShopResponseDto getShopById(UUID id) { 
+    public Shop getShopById(UUID id) {
         return shopRepository.findById(id)
-            .map(shopEncontrada -> new ShopResponseDto(shopEncontrada)) 
-            .orElseThrow(() -> new EntityNotFoundException("Shop not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Shop not found."));
     }
     
 
