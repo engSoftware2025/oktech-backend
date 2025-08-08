@@ -143,4 +143,15 @@ public class ProductServiceImpl implements ProductService {
         productRepository.delete(product);
     }
 
+    /**
+     * Obtém todos os produtos de uma loja específica com paginação.
+     * @param shopId ID da loja cujos produtos serão obtidos.
+     * @param pageable Objeto Pageable para paginação.
+     * @return Página de produtos da loja especificada.
+     */
+    @Override
+    public Page<Product> getProductsByShopId(UUID shopId, Pageable pageable) {
+        return productRepository.findByShopId(shopId, pageable);
+    }
+
 }

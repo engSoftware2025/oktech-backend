@@ -6,6 +6,9 @@ import com.oktech.boasaude.entity.User;
 
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+
 import com.oktech.boasaude.dto.ShopCreateRequestDto;
 
 public interface ShopService {
@@ -20,5 +23,7 @@ public interface ShopService {
 
     void deleteShop(UUID id, User currentUser);
 
-    Shop getShopById(UUID id);
+    Page<ShopResponseDto> getAllShops(Pageable pageable); // Obtém todas as lojas
+
+    ShopResponseDto getShopById(UUID id);
 }
