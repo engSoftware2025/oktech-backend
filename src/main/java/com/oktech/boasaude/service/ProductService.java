@@ -15,6 +15,8 @@ import com.oktech.boasaude.entity.User;
  * criar novos produtos, atualizar informações de produtos existentes, etc.
  * @author João Martins
  * @version 1.0 
+ * @author Lucas do Ouro
+ * @version 1.1 - Adicionado método para obter produtos por ID de loja.
  */
 
 
@@ -29,5 +31,7 @@ public interface ProductService {
     Product updateProduct(UUID id, CreateProductDto product, User currentUser);
 
     void deleteProduct(UUID id, User currentUser);
+
+    Page<Product> getProductsByShopId(UUID shopId, Pageable pageable);
 
 }
