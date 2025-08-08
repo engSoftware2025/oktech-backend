@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.oktech.boasaude.dto.CreateUserDto;
 import com.oktech.boasaude.dto.LoginUserDto;
+import com.oktech.boasaude.dto.TokenResponse;
 import com.oktech.boasaude.service.TokenService;
 import com.oktech.boasaude.service.UserService;
 
@@ -18,7 +19,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 
 /**
  * AuthController recebe as requisições de autenticação e registro de usuários.
@@ -63,34 +63,33 @@ public class AuthController {
 
     @PostMapping("register")
     public ResponseEntity<String> registerUser(@RequestBody @Valid CreateUserDto createUserDto) {
-    try
-    {    
-        logger.info("Registering user: {}", createUserDto);
-        
-        userService.createUser(createUserDto);
+        try {
+            logger.info("Registering user: {}", createUserDto);
 
-        logger.info("User registered successfully: {}", createUserDto.email());
-        return ResponseEntity.ok("User registered successfully");
+            userService.createUser(createUserDto);
+
+            logger.info("User registered successfully: {}", createUserDto.email());
+            return ResponseEntity.ok("User registered successfully");
+        } catch (Exception ex) {
+            logger.error("Error registering user: {}", createUserDto.email(), ex);
+            return ResponseEntity.status(500).body("Error registering user");
+        }
     }
-    catch (Exception ex) {
-        logger.error("Error registering user: {}", createUserDto.email(), ex);
-        return ResponseEntity.status(500).body("Error registering user");
+
+    @PostMapping("login")
+    public ResponseEntity<TokenResponse> loginUser(@RequestBody @Valid LoginUserDto loginUserDto) {
+        logger.info("User login attempt: {}", loginUserDto.email());
+        try {
+            var authenticationToken = new UsernamePasswordAuthenticationToken(
+                    loginUserDto.email(), loginUserDto.password());
+
+            var authentication = manager.authenticate(authenticationToken);
+
+            String token = tokenService.generateToken(authentication.getName());
+            return ResponseEntity.ok(new TokenResponse(token));
+        } catch (AuthenticationException ex) {
+            logger.error("Authentication failed for user: {}", loginUserDto.email(), ex);
+            return ResponseEntity.status(401).body(new TokenResponse("Invalid credentials"));
+        }
     }
-}
-
-@PostMapping("login")
-public ResponseEntity<String> loginUser(@RequestBody @Valid LoginUserDto loginUserDto) {
-    try {
-        var authenticationToken = new UsernamePasswordAuthenticationToken(
-            loginUserDto.email(), loginUserDto.password());
-
-        var authentication = manager.authenticate(authenticationToken);
-
-        String token = tokenService.generateToken(authentication.getName());
-        return ResponseEntity.ok(token);
-    } catch (AuthenticationException ex) {
-        logger.error("Authentication failed for user: {}", loginUserDto.email(), ex);
-        return ResponseEntity.status(401).body("Invalid credentials");
-    }
-}
 }

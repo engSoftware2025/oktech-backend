@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.oktech.boasaude.dto.CreateUserDto;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -26,11 +28,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 /**
  * Entidade que representa um usuário do sistema.
- * Contém informações como nome, email, CPF, senha, provedor de autenticação e papel do usuário.
+ * Contém informações como nome, email, CPF, senha, provedor de autenticação e
+ * papel do usuário.
  * Implementa UserDetails para integração com o Spring Security.
+ * 
  * @author Arlindo Neto
  * @version 1.0
  */
@@ -42,6 +45,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@EntityListeners(AuditingEntityListener.class)
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -73,7 +77,6 @@ public class User implements UserDetails {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-
     /**
      * Construtor para criar um usuário com o papel de USUÁRIO.
      */
@@ -85,15 +88,16 @@ public class User implements UserDetails {
         this.authProvider = AuthProvider.LOCAL; // Default to local authentication
         this.role = UserRole.USER; // Default role is USER
         this.isActive = true; // New users are active by default
-        
+
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.role != null
                 ? this.role.getAuthorities()
                 : List.of(new SimpleGrantedAuthority("ROLE_USER")); // fallback
     }
-    
+
     @Override
     public String getUsername() {
         return email;

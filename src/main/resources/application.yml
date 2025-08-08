@@ -6,14 +6,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-logging:
-  level:
-    org:
-      springframework: ERROR
-      hibernate: ERROR
-    com:
-      oktech:
-        boasaude: ERROR
+
 
 jwt:
   secret: mysecret

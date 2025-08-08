@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.oktech.boasaude.dto.CreateUserDto;
 
 import com.oktech.boasaude.entity.User;
+import com.oktech.boasaude.entity.UserRole;
 import com.oktech.boasaude.repository.UserRepository;
 import com.oktech.boasaude.service.UserService;
 
@@ -73,24 +74,26 @@ public class UserServiceImpl implements UserService {
      * Busca um usuário pelo ID.
      * 
      * @param id ID do usuário a ser buscado.
-     * @return O usuário encontrado ou null se não existir.
+     * @return O usuário encontrado.
+     * @throws IllegalArgumentException se o usuário não for encontrado.
      */
     @Override
     public User getUserById(UUID id) {
         try {
             logger.info("Fetching user by ID: {}", id);
+    
             return userRepository.findById(id).orElse(null);
         } catch (Exception e) {
             logger.error("Error fetching user by ID: {}", id, e);
+            throw new IllegalArgumentException("User not found: " + id, e);
         }
-        return null;
     }
 
     /**
-     * Busca um usuário pelo email.
+     * Busca todos os usuários com paginação.
      * 
-     * @param email Email do usuário a ser buscado.
-     * @return O usuário encontrado ou null se não existir.
+     * @param pageable Objeto Pageable para paginação.
+     * @return Uma página de usuários.
      */
     @Override
     public Page<User> getAllUsers(Pageable pageable) {
@@ -117,7 +120,7 @@ public class UserServiceImpl implements UserService {
             return userRepository.save(existingUser);
         }
         logger.error("User not found for ID: {}", id);
-        return null;
+        throw new IllegalArgumentException("User not found: " + id);
     }
 
     /**
@@ -137,6 +140,7 @@ public class UserServiceImpl implements UserService {
             userRepository.save(existingUser);
         } else {
             logger.error("User not found for ID: {}", id);
+            throw new IllegalArgumentException("User not found: " + id);
         }
     }
 
@@ -155,7 +159,27 @@ public class UserServiceImpl implements UserService {
             return user.get();
         } else {
             logger.warn("User not found for email: {}", email);
-            return null;
+            throw new IllegalArgumentException("User not found: " + email);
         }
+    }
+
+    /**
+     * Atualiza o papel de um usuário.
+     * 
+     * @param userId   ID do usuário a ser atualizado.
+     * @param userRole Novo papel do usuário.
+     * @return true se a atualização foi bem-sucedida, false caso contrário.
+     */
+    @Override
+    public boolean updateUserRole(UUID userId, UserRole userRole) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            logger.error("User not found with ID: {}", userId);
+            throw new IllegalArgumentException("User not found: " + userId);
+        }
+        user.setRole(userRole);
+        userRepository.save(user);
+        logger.info("User role updated successfully for ID: {}", userId);
+        return true;
     }
 }
