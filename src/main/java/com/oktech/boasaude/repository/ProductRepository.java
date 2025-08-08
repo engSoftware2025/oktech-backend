@@ -14,6 +14,8 @@ import java.util.UUID;
  * 
  * @author João Martins
  * @version 1.0
+ * @author Lucas do Ouro
+ * @version 1.1 - Adicionado método para buscar produtos por ID de loja.
  */
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
@@ -23,6 +25,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
 
     Page<Product> findByCategory(String category, Pageable pageable);
 
-    Page<Product> findByShopIdAndNameContainingIgnoreCase(UUID shopId, String name, Pageable pageable);
+    Page<Product> findByShopId(UUID shopId, Pageable pageable);
 
 }
