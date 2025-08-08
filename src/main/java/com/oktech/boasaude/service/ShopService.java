@@ -25,5 +25,5 @@ public interface ShopService {
 
     Page<ShopResponseDto> getAllShops(Pageable pageable); // Obtém todas as lojas
 
-    ShopResponseDto getShopById(UUID id);
+    Shop getShopById(UUID id);
 }
