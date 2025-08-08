@@ -8,11 +8,15 @@ import com.oktech.boasaude.entity.UserRole;
 import com.oktech.boasaude.repository.ShopRepository;
 import com.oktech.boasaude.service.ShopService;
 
+
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 import java.util.regex.Pattern;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * * Implementação do serviço de loja.
@@ -22,6 +26,11 @@ import java.util.regex.Pattern;
  * @version 1.1 - Corrigido o método createShop para verificar se o usuário já
  *          possui uma loja associada e validar o CNPJ.
  * @version 1.0 - Implementação inicial do serviço de loja.
+ * @version 1.2 - Adicionado método para validar CNPJ e corrigido o método de
+ *          atualização de loja.
+ * @version 1.3 - Adicionado método para deletar loja e corrigido o método de
+ *          atualização de loja para verificar se o usuário é o proprietário.
+ * @version 1.4 - Adicionado método para obter todas as lojas com paginação.
  */
 
 @Service
@@ -65,6 +74,7 @@ public class ShopServiceImpl implements ShopService {
 
         return new ShopResponseDto(savedShop); // Retorna a resposta com os dados da loja salva
     }
+    
 
     // Obtém a loja associada ao usuário
     @Override
@@ -72,6 +82,12 @@ public class ShopServiceImpl implements ShopService {
         return shopRepository.findByOwnerId(user.getId()) // Se a loja for encontrada, converte para ShopResponseDto
                 .map(ShopResponseDto::new) // Retorna a loja encontrada como ShopResponseDto
                 .orElseThrow(() -> new IllegalArgumentException("Loja não encontrada para o usuário."));
+    }
+
+    @Override
+    public Page<ShopResponseDto> getAllShops(Pageable pageable) {
+        return shopRepository.findAll(pageable)
+                .map(shop -> new ShopResponseDto(shop)); // Converte cada loja para ShopResponseDto
     }
 
     // Valida o CNPJ usando o padrão definido
