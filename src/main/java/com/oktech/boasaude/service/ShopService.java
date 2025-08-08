@@ -1,6 +1,7 @@
 package com.oktech.boasaude.service;
 
 import com.oktech.boasaude.dto.ShopResponseDto;
+import com.oktech.boasaude.entity.Shop;
 import com.oktech.boasaude.entity.User;
 
 import java.util.UUID;

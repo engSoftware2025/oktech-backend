@@ -88,24 +88,15 @@ public class ShopController {
      */
     @PostMapping("/create")
     public ResponseEntity<ShopResponseDto> createShop(@Valid @RequestBody ShopCreateRequestDto shopCreateDto, Authentication authentication) {
-        try
-        { 
-            if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
-                logger.warn("User not authenticated");
-                return ResponseEntity.status(401).build();
-            }
-    
-            User user = (User) authentication.getPrincipal();
-            ShopResponseDto shopResponse = shopService.createShop(user, shopCreateDto);
-            logger.info("Shop created successfully for user ID: {}", user.getId());
-            return ResponseEntity.ok(shopResponse);
+        if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
+            logger.warn("User not authenticated");
+            return ResponseEntity.status(401).build();
         }
-        catch (Exception e) 
-        {
-            logger.error("Error creating shop: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body(null);
 
-        }
+        User user = (User) authentication.getPrincipal();
+        ShopResponseDto shopResponse = shopService.createShop(user, shopCreateDto);
+        logger.info("Shop created successfully for user ID: {}", user.getId());
+        return ResponseEntity.ok(shopResponse);
     }
 
     @GetMapping()

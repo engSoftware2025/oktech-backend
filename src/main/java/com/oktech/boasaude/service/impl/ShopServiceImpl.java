@@ -57,9 +57,9 @@ public class ShopServiceImpl implements ShopService {
         if (!shopRepository.findAllByNameContainingIgnoreCase(user.getName()).isEmpty()) {
             throw new IllegalArgumentException("Usuário já possui uma loja associada.");
         }
-        // Valida o CNPJ
+        // Valida se o usuário já possui uma loja
         if (shopRepository.findByOwnerId(user.getId()).isPresent()) {
-            throw new IllegalArgumentException("CNPJ já cadastrado.");
+            throw new IllegalArgumentException("Usuário já possui uma loja associada.");
         }
         if (!isValidCnpj(dto.cnpj())) {
             throw new IllegalArgumentException("CNPJ inválido.");
@@ -132,9 +132,12 @@ public class ShopServiceImpl implements ShopService {
         }
 
         // Valida o CNPJ
-        if (shopRepository.findByOwnerId(currentUser.getId()).isPresent()) {
-            throw new IllegalArgumentException("CNPJ já cadastrado.");
-        }
+        shopRepository.findAll().stream()
+            .filter(s -> s.getCnpj().equals(dto.cnpj()) && !s.getId().equals(id))
+            .findAny()
+            .ifPresent(s -> {
+                throw new IllegalArgumentException("CNPJ já cadastrado.");
+            });
         if (!isValidCnpj(dto.cnpj())) {
             throw new IllegalArgumentException("CNPJ inválido.");
         }
@@ -148,5 +151,5 @@ public class ShopServiceImpl implements ShopService {
         return new ShopResponseDto(shop);
     }
 
-    
+
 }

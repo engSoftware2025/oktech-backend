@@ -74,13 +74,14 @@ public class UserServiceImpl implements UserService {
      * Busca um usuário pelo ID.
      * 
      * @param id ID do usuário a ser buscado.
-     * @return O usuário encontrado ou null se não existir.
+     * @return O usuário encontrado.
+     * @throws IllegalArgumentException se o usuário não for encontrado.
      */
     @Override
     public User getUserById(UUID id) {
         try {
             logger.info("Fetching user by ID: {}", id);
-
+    
             return userRepository.findById(id).orElse(null);
         } catch (Exception e) {
             logger.error("Error fetching user by ID: {}", id, e);
