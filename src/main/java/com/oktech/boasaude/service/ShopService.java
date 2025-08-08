@@ -23,4 +23,6 @@ public interface ShopService {
     void deleteShop(UUID id, User currentUser);
 
     Page<ShopResponseDto> getAllShops(Pageable pageable); // Obtém todas as lojas
+
+    ShopResponseDto getShopById(UUID id);
 }
