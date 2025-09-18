@@ -72,7 +72,7 @@ public class AuthController {
             return ResponseEntity.ok("User registered successfully");
         } catch (Exception ex) {
             logger.error("Error registering user: {}", createUserDto.email(), ex);
-            return ResponseEntity.status(500).body("Error registering user");
+            return ResponseEntity.badRequest().body("Error: " + ex.getMessage());
         }
     }
 
