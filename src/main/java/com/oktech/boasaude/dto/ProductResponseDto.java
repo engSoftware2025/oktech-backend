@@ -1,5 +1,6 @@
 package com.oktech.boasaude.dto;
 import com.oktech.boasaude.entity.Product;
+import com.oktech.boasaude.entity.ProductStatus;
 
 /** * DTO para resposta de produto.
  * Contém os campos necessários para a representação de um produto na API.
@@ -13,7 +14,8 @@ public record ProductResponseDto(
     String description,
     Integer price,
     String category,
-    Integer stock
+    Integer stock,
+    ProductStatus status
 ) {
     /**
      * Construtor para criar um ProductResponseDto a partir de uma entidade Product.
@@ -26,7 +28,8 @@ public record ProductResponseDto(
             product.getDescription(),
             product.getPrice(),
             product.getCategory(),
-            product.getStock()
+            product.getStock(),
+            product.getStatus()
         );
     }
 }

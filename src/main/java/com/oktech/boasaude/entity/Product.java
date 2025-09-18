@@ -11,6 +11,8 @@ import com.oktech.boasaude.dto.CreateProductDto;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -57,6 +59,9 @@ public class Product {
     private String category;
 
     private Integer stock;
+
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status = ProductStatus.PENDING; // Status padrão é PENDING
 
     // Timestamps for creation and last update
     @CreatedDate

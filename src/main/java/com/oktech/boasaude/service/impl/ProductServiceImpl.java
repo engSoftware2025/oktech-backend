@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.oktech.boasaude.dto.CreateProductDto;
 import com.oktech.boasaude.entity.Product;
+import com.oktech.boasaude.entity.ProductStatus;
 import com.oktech.boasaude.entity.Shop;
 import com.oktech.boasaude.entity.User;
+import com.oktech.boasaude.entity.UserRole;
 import com.oktech.boasaude.repository.ProductRepository;
 import com.oktech.boasaude.service.ProductService;
 
@@ -152,6 +154,66 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<Product> getProductsByShopId(UUID shopId, Pageable pageable) {
         return productRepository.findByShopId(shopId, pageable);
+    }
+
+    // Métodos para consultas públicas (apenas produtos aprovados)
+    @Override
+    public Page<Product> getApprovedProducts(Pageable pageable) {
+        return productRepository.findByStatus(ProductStatus.APPROVED, pageable);
+    }
+
+    @Override
+    public Page<Product> getApprovedProductsByShopId(UUID shopId, Pageable pageable) {
+        return productRepository.findByStatusAndShopId(ProductStatus.APPROVED, shopId, pageable);
+    }
+
+    @Override
+    public Page<Product> getApprovedProductsByName(String name, Pageable pageable) {
+        return productRepository.findByStatusAndNameContainingIgnoreCase(ProductStatus.APPROVED, name, pageable);
+    }
+
+    @Override
+    public Page<Product> getApprovedProductsByCategory(String category, Pageable pageable) {
+        return productRepository.findByStatusAndCategory(ProductStatus.APPROVED, category, pageable);
+    }
+
+    // Métodos para admin gerenciar aprovações
+    @Override
+    public Page<Product> getProductsByStatus(ProductStatus status, Pageable pageable) {
+        return productRepository.findByStatus(status, pageable);
+    }
+
+    @Override
+    public Page<Product> getPendingProducts(Pageable pageable) {
+        return productRepository.findByStatus(ProductStatus.PENDING, pageable);
+    }
+
+    @Override
+    public Product approveProduct(UUID productId, User adminUser) {
+        // Verificar se o usuário é admin
+        if (!adminUser.getRole().equals(UserRole.ADMIN)) {
+            throw new AccessDeniedException("Apenas administradores podem aprovar produtos.");
+        }
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado com ID: " + productId));
+
+        product.setStatus(ProductStatus.APPROVED);
+        return productRepository.save(product);
+    }
+
+    @Override
+    public Product rejectProduct(UUID productId, User adminUser) {
+        // Verificar se o usuário é admin
+        if (!adminUser.getRole().equals(UserRole.ADMIN)) {
+            throw new AccessDeniedException("Apenas administradores podem rejeitar produtos.");
+        }
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Produto não encontrado com ID: " + productId));
+
+        product.setStatus(ProductStatus.REJECTED);
+        return productRepository.save(product);
     }
 
 }

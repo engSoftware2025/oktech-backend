@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.oktech.boasaude.dto.CreateProductDto;
 import com.oktech.boasaude.entity.Product;
+import com.oktech.boasaude.entity.ProductStatus;
 import com.oktech.boasaude.entity.User;
 
 /**
@@ -33,5 +34,23 @@ public interface ProductService {
     void deleteProduct(UUID id, User currentUser);
 
     Page<Product> getProductsByShopId(UUID shopId, Pageable pageable);
+
+    // Métodos para consultas públicas (apenas produtos aprovados)
+    Page<Product> getApprovedProducts(Pageable pageable);
+    
+    Page<Product> getApprovedProductsByShopId(UUID shopId, Pageable pageable);
+    
+    Page<Product> getApprovedProductsByName(String name, Pageable pageable);
+    
+    Page<Product> getApprovedProductsByCategory(String category, Pageable pageable);
+
+    // Métodos para admin gerenciar aprovações
+    Page<Product> getProductsByStatus(ProductStatus status, Pageable pageable);
+    
+    Page<Product> getPendingProducts(Pageable pageable);
+    
+    Product approveProduct(UUID productId, User adminUser);
+    
+    Product rejectProduct(UUID productId, User adminUser);
 
 }

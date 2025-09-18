@@ -1,6 +1,7 @@
 package com.oktech.boasaude.repository;
 
 import com.oktech.boasaude.entity.Product;
+import com.oktech.boasaude.entity.ProductStatus;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,5 +27,14 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
     Page<Product> findByCategory(String category, Pageable pageable);
 
     Page<Product> findByShopId(UUID shopId, Pageable pageable);
+
+    // Métodos para busca por status
+    Page<Product> findByStatus(ProductStatus status, Pageable pageable);
+    
+    Page<Product> findByStatusAndShopId(ProductStatus status, UUID shopId, Pageable pageable);
+    
+    Page<Product> findByStatusAndNameContainingIgnoreCase(ProductStatus status, String name, Pageable pageable);
+    
+    Page<Product> findByStatusAndCategory(ProductStatus status, String category, Pageable pageable);
 
 }

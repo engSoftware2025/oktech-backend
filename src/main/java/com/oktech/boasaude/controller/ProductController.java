@@ -28,7 +28,9 @@ import org.springframework.data.web.PageableDefault;
 import com.oktech.boasaude.dto.CreateProductDto;
 import com.oktech.boasaude.dto.ProductResponseDto;
 import com.oktech.boasaude.entity.Product;
+import com.oktech.boasaude.entity.ProductStatus;
 import com.oktech.boasaude.entity.User;
+import com.oktech.boasaude.entity.UserRole;
 import com.oktech.boasaude.service.ProductService;
 
 /**
@@ -85,10 +87,11 @@ public class ProductController {
     public ResponseEntity<Page<ProductResponseDto>> getAllProducts(
         @ParameterObject @PageableDefault(page = 0, size = 10) Pageable pageable) {
         
-        Page<Product> productsPage = productService.getAllProducts(pageable);
+        // Apenas produtos aprovados são exibidos publicamente
+        Page<Product> productsPage = productService.getApprovedProducts(pageable);
 
         Page<ProductResponseDto> products = productsPage.map(ProductResponseDto::new);
-        logger.info("Products retrieved successfully, count: {}", products.getTotalElements());
+        logger.info("Approved products retrieved successfully, count: {}", products.getTotalElements());
         return ResponseEntity.ok(products);
     }
 
@@ -146,6 +149,121 @@ public class ProductController {
         }catch(Exception e) {
             logger.error("Error deleting product: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Error deleting product"));
+        }
+    }
+
+    // ========== ENDPOINTS PARA ADMIN ==========
+
+    @GetMapping("/admin/pending")
+    public ResponseEntity<Page<ProductResponseDto>> getPendingProducts(
+        @ParameterObject @PageableDefault(page = 0, size = 10) Pageable pageable,
+        Authentication authentication) {
+        try {
+            if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
+                logger.warn("User not authenticated");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            User user = (User) authentication.getPrincipal();
+            if (!user.getRole().equals(UserRole.ADMIN)) {
+                logger.warn("User {} is not admin", user.getEmail());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            Page<Product> productsPage = productService.getPendingProducts(pageable);
+            Page<ProductResponseDto> products = productsPage.map(ProductResponseDto::new);
+            
+            logger.info("Pending products retrieved successfully, count: {}", products.getTotalElements());
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            logger.error("Error retrieving pending products: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/admin/by-status/{status}")
+    public ResponseEntity<Page<ProductResponseDto>> getProductsByStatus(
+        @PathVariable String status,
+        @ParameterObject @PageableDefault(page = 0, size = 10) Pageable pageable,
+        Authentication authentication) {
+        try {
+            if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
+                logger.warn("User not authenticated");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            User user = (User) authentication.getPrincipal();
+            if (!user.getRole().equals(UserRole.ADMIN)) {
+                logger.warn("User {} is not admin", user.getEmail());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            ProductStatus productStatus;
+            try {
+                productStatus = ProductStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                logger.warn("Invalid status: {}", status);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            Page<Product> productsPage = productService.getProductsByStatus(productStatus, pageable);
+            Page<ProductResponseDto> products = productsPage.map(ProductResponseDto::new);
+            
+            logger.info("Products with status {} retrieved successfully, count: {}", status, products.getTotalElements());
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            logger.error("Error retrieving products by status: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/admin/approve/{id}")
+    public ResponseEntity<ProductResponseDto> approveProduct(
+        @PathVariable UUID id,
+        Authentication authentication) {
+        try {
+            if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
+                logger.warn("User not authenticated");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            User user = (User) authentication.getPrincipal();
+            if (!user.getRole().equals(UserRole.ADMIN)) {
+                logger.warn("User {} is not admin", user.getEmail());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            Product approvedProduct = productService.approveProduct(id, user);
+            logger.info("Product {} approved successfully by admin {}", id, user.getEmail());
+            return ResponseEntity.ok(new ProductResponseDto(approvedProduct));
+        } catch (Exception e) {
+            logger.error("Error approving product: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping("/admin/reject/{id}")
+    public ResponseEntity<ProductResponseDto> rejectProduct(
+        @PathVariable UUID id,
+        Authentication authentication) {
+        try {
+            if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
+                logger.warn("User not authenticated");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            User user = (User) authentication.getPrincipal();
+            if (!user.getRole().equals(UserRole.ADMIN)) {
+                logger.warn("User {} is not admin", user.getEmail());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            Product rejectedProduct = productService.rejectProduct(id, user);
+            logger.info("Product {} rejected successfully by admin {}", id, user.getEmail());
+            return ResponseEntity.ok(new ProductResponseDto(rejectedProduct));
+        } catch (Exception e) {
+            logger.error("Error rejecting product: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }
