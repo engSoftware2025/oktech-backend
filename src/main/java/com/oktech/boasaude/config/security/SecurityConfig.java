@@ -39,15 +39,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "v1/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "api/product-imagens/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "uploads/images/**").permitAll()
                         .requestMatchers(
-                            "/v1/auth/**", 
-                            "/actuator/**", 
-                            "/v3/api-docs/**", 
-                            "/swagger-ui.html",
-                            "/swagger-ui/**", 
-                            "v1/shops/all", 
-                            "v1/shops/{shopId}/products"
-                        )
+                                "/v1/auth/**",
+                                "/actuator/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "v1/shops/all",
+                                "v1/shops/{shopId}/products")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
