@@ -27,17 +27,14 @@ public class ProductImageService {
     private static final int MAX_IMAGES_PER_PRODUCT = 5;
     List<String> ALLOWED_IMAGE_EXTENSIONS = List.of(".jpg", ".jpeg", ".png", ".gif");
 
-
     private static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-    
+
     @Value("${storage.path:uploads/images}")
     private String storagePath;
 
-    
-    
     private final ProductImageRepository productImageRepository;
     private final ProductRepository productRepository;
-    
+
     public ProductImageService(ProductImageRepository productImageRepository, ProductRepository productRepository) {
         this.productImageRepository = productImageRepository;
         this.productRepository = productRepository;
@@ -45,17 +42,19 @@ public class ProductImageService {
 
     /**
      * Salva um ou múltiplos arquivos de imagem associados a um produto específico
-     * @param files Lista de arquivos de imagem a serem salvos (máximo 5)
+     * 
+     * @param files     Lista de arquivos de imagem a serem salvos (máximo 5)
      * @param productId O ID do produto ao qual as imagens serão associadas
      * @return Lista das imagens salvas
-     * @throws RuntimeException se o produto não for encontrado, se exceder o limite ou se ocorrer erro ao salvar
+     * @throws RuntimeException se o produto não for encontrado, se exceder o limite
+     *                          ou se ocorrer erro ao salvar
      */
     public List<ProductImage> saveFilesWithProduct(List<MultipartFile> files, UUID productId) {
         validateFiles(files);
-        
+
         Product product = findProductById(productId);
         validateImageLimit(productId, files.size());
-        
+
         return saveImageFiles(files, product);
     }
 
@@ -63,7 +62,7 @@ public class ProductImageService {
         if (files.size() > MAX_IMAGES_PER_PRODUCT) {
             throw new RuntimeException("Maximum " + MAX_IMAGES_PER_PRODUCT + " images allowed per product");
         }
-        
+
         if (files.isEmpty() || files.stream().allMatch(MultipartFile::isEmpty)) {
             throw new RuntimeException("At least one valid image file is required");
         }
@@ -79,7 +78,8 @@ public class ProductImageService {
 
             if (!ALLOWED_IMAGE_EXTENSIONS.contains(extension)) {
                 logger.error("Invalid file type: {}", extension);
-                throw new RuntimeException("Invalid file type: " + extension + ". Allowed types: " + String.join(", ", ALLOWED_IMAGE_EXTENSIONS));
+                throw new RuntimeException("Invalid file type: " + extension + ". Allowed types: "
+                        + String.join(", ", ALLOWED_IMAGE_EXTENSIONS));
             }
         }
 
@@ -93,27 +93,27 @@ public class ProductImageService {
     private void validateImageLimit(UUID productId, int newImagesCount) {
         long existingImagesCount = countImagesByProductId(productId);
         long totalAfterUpload = existingImagesCount + newImagesCount;
-        
+
         if (totalAfterUpload > MAX_IMAGES_PER_PRODUCT) {
             throw new RuntimeException(String.format(
-                "Product can have maximum %d images. Current: %d, trying to add: %d", 
-                MAX_IMAGES_PER_PRODUCT, existingImagesCount, newImagesCount));
+                    "Product can have maximum %d images. Current: %d, trying to add: %d",
+                    MAX_IMAGES_PER_PRODUCT, existingImagesCount, newImagesCount));
         }
     }
 
     private List<ProductImage> saveImageFiles(List<MultipartFile> files, Product product) {
         List<ProductImage> savedImages = new ArrayList<>();
-        
+
         try {
             Path uploadPath = createUploadDirectory();
-            
+
             for (MultipartFile file : files) {
                 if (!file.isEmpty()) {
                     ProductImage savedImage = saveImageFile(file, product, uploadPath);
                     savedImages.add(savedImage);
                 }
             }
-            
+
             return savedImages;
         } catch (IOException e) {
             cleanupFailedUploads(savedImages);
@@ -132,20 +132,20 @@ public class ProductImageService {
     private ProductImage saveImageFile(MultipartFile file, Product product, Path uploadPath) throws IOException {
         String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
         Path filePath = uploadPath.resolve(uniqueFileName);
-        
+
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-        
+
         ProductImage productImage = new ProductImage();
         productImage.setImageUrl(filePath.toString());
         productImage.setProduct(product);
-        
+
         return productImageRepository.save(productImage);
     }
 
     private String generateUniqueFileName(String originalFileName) {
-        return System.currentTimeMillis() + "_" + 
-               UUID.randomUUID().toString().substring(0, 8) + "_" + 
-               originalFileName;
+        return System.currentTimeMillis() + "_" +
+                UUID.randomUUID().toString().substring(0, 8) + "_" +
+                originalFileName;
     }
 
     private void cleanupFailedUploads(List<ProductImage> savedImages) {
@@ -161,6 +161,7 @@ public class ProductImageService {
 
     /**
      * Retorna todas as imagens de um produto pelo ID do produto
+     * 
      * @param productId O ID do produto
      * @return Lista de imagens do produto
      */
@@ -170,6 +171,7 @@ public class ProductImageService {
 
     /**
      * Retorna uma imagem específica pelo seu ID
+     * 
      * @param imageId O ID da imagem
      * @return Optional contendo a imagem se encontrada
      */
@@ -179,10 +181,37 @@ public class ProductImageService {
 
     /**
      * Conta o número de imagens de um produto específico
+     * 
      * @param productId O ID do produto
      * @return Número de imagens do produto
      */
     public long countImagesByProductId(UUID productId) {
         return productImageRepository.findByProductId(productId).size();
+    }
+
+    /**
+     * Deleta todas as imagens associadas a um produto específico
+     * 
+     * @param productId O ID do produto cujas imagens serão deletadas
+     */
+    public void deleteAllImagesByProductId(UUID productId) {
+        List<ProductImage> images = productImageRepository.findByProductId(productId);
+
+        for (ProductImage image : images) {
+            try {
+                // Deleta o arquivo físico
+                Path imagePath = Paths.get(image.getImageUrl());
+                Files.deleteIfExists(imagePath);
+                logger.info("Deleted image file: {}", image.getImageUrl());
+            } catch (IOException e) {
+                logger.error("Failed to delete image file: {}", image.getImageUrl(), e);
+                // Continua com a exclusão do registro no banco mesmo se não conseguir deletar o
+                // arquivo
+            }
+        }
+
+        // Deleta todos os registros de imagem do banco de dados
+        productImageRepository.deleteAll(images);
+        logger.info("Deleted {} images for product with id: {}", images.size(), productId);
     }
 }
